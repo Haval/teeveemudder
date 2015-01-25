@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <title>MUD</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font: 13px Helvetica, Arial;
+      }
+
+      form {
+        background: #000;
+        padding: 3px;
+        position: fixed;
+        width: 100%;
+        top: 0px;
+      }
+
+      form input {
+        border: 0;
+        padding: 10px;
+        width: 90%;
+        margin-right: .5%;
+      }
+
+      form button {
+        width: 9%;
+        background: #eee;
+        border: none;
+        padding: 10px;
+      }
+      
+      #messages {
+        z-index: -1;
+        position: relative;
+        list-style-type: none;
+        padding: 0;
+        top: 3em;
+      }
+
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <form id="joinForm" action="">
+      <input id="name" autocomplete="off" value="Hoov" /><button>Join</button>
+    </form>
+    
+    <form id="commandForm" action="" style="display:none;">
+      <input id="msg" autocomplete="off" /><button>Send</button>
+    </form>
+
+    <div>
+      <ul id="messages"></ul>
+    </div>
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+
+      $('#name').focus();
+
+      $('#joinForm').submit(function(){
+        socket.emit('join', $('#name').val());
+        $('#name').val('');
+
+        $(this).hide();
+        $('#commandForm').show();
+        $('#msg').focus();
+        return false;
+      });
+      
+      $('#commandForm').submit(function(){
+        socket.emit('command', $('#msg').val());
+        $('#msg').val('');
+        return false;
+      });
+
+      var $messages = $('#messages');
+
+      socket.on('message', function(msg) {
+        $messages.append($('<li>').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('fight', function(msg) {
+        $messages.append($('<li style="color:red;">').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('fightComplete', function(msg) {
+        $messages.append($('<li style="color:green;">').text(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+    </script>
+  </body>
+</html>
