@@ -11,7 +11,7 @@ app.get('/', function(req, res) {
 });
 
 http.listen(3000, function() {
-	console.log('Running server...');
+	console.log('Running server on port %d...', http.address().port);
 });
 
 io.on('connection', function(socket) {
